@@ -258,6 +258,12 @@ export interface RenovateConfig
   inheritConfigStrict?: boolean;
 
   ignorePresets?: string[];
+  jiraBaseUrl?: string;
+  jiraProjectKey?: string;
+  jiraIssueType?: string;
+  jiraUsername?: string;
+  jiraToken?: string;
+  jiraLabels?: string[];
   forkProcessing?: 'auto' | 'enabled' | 'disabled';
   isFork?: boolean;
 

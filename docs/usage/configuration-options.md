@@ -2481,6 +2481,30 @@ Currently this applies to the `minimumReleaseAge` check only.
 The `flexible` mode can result in "flapping" of Pull Requests, for example: a pending PR with version `1.0.3` is first released but then downgraded to `1.0.2` once it passes `minimumReleaseAge`.
 We recommend that you use the `strict` mode, and enable the `dependencyDashboard` so that you can see suppressed PRs.
 
+## jiraBaseUrl
+
+Base URL of your Jira instance.
+
+## jiraProjectKey
+
+Jira project key used when creating issues.
+
+## jiraIssueType
+
+Issue type for created Jira issues.
+
+## jiraUsername
+
+Username for Jira authentication.
+
+## jiraToken
+
+Token used for Jira authentication.
+
+## jiraLabels
+
+Labels to add to created Jira issues. `<repository>` resolves to the repository slug and `<branch>` to the branch name. These two labels are always added in addition to any configured values.
+
 ## keepUpdatedLabel
 
 On supported platforms you may add a label to a PR so that Renovate recreates/rebases the PR when the branch falls behind the base branch.

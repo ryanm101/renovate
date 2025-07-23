@@ -1865,6 +1865,38 @@ const options: RenovateOptions[] = [
     allowedValues: ['auto', 'never'],
     default: 'auto',
   },
+  {
+    name: 'jiraBaseUrl',
+    description: 'Base URL of the Jira instance.',
+    type: 'string',
+  },
+  {
+    name: 'jiraProjectKey',
+    description: 'Jira project key used for created issues.',
+    type: 'string',
+  },
+  {
+    name: 'jiraIssueType',
+    description: 'Jira issue type used when creating issues.',
+    type: 'string',
+  },
+  {
+    name: 'jiraUsername',
+    description: 'Username for Jira authentication.',
+    type: 'string',
+  },
+  {
+    name: 'jiraToken',
+    description: 'API token for Jira authentication.',
+    type: 'string',
+  },
+  {
+    name: 'jiraLabels',
+    description:
+      'Labels to apply to created Jira issues. `<repository>` and `<branch>` are always added.',
+    type: 'array',
+    subType: 'string',
+  },
   // PR Behavior
   {
     name: 'keepUpdatedLabel',

@@ -47,6 +47,25 @@ Remember to:
 - Set the `username` for the bot account, which is your Atlassian account email. You can find your email through "Personal Bitbucket settings" on the "Email aliases" page for your account
 - Set `platform=bitbucket` somewhere in your Renovate config file
 
+## Jira integration
+
+To automatically create Jira issues for new pull requests configure the following fields:
+
+```json
+{
+  "jiraBaseUrl": "https://jira.example.com",
+  "jiraProjectKey": "PROJ",
+  "jiraIssueType": "Task",
+  "jiraUsername": "bot@example.com",
+  "jiraToken": "your-token",
+  "jiraLabels": ["deps"]
+}
+```
+
+Repository and branch names are always added to the labels automatically.
+
+Renovate will create a Jira issue after creating the PR and append the issue key to the PR title.
+
 ## Unsupported platform features/concepts
 
 - Adding assignees to PRs not supported (does not seem to be a Bitbucket concept)

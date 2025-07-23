@@ -23,6 +23,7 @@ import * as _prCache from './pr-cache';
 import { generatePrBodyFingerprintConfig } from './pr-fingerprint';
 import { ensurePr } from '.';
 import { git, logger, partial, platform, scm } from '~test/util';
+import * as jira from '../../../../util/jira/create-issue';
 
 vi.mock('../../changelog');
 
@@ -43,6 +44,9 @@ const comment = vi.mocked(_comment);
 
 vi.mock('./pr-cache');
 const prCache = vi.mocked(_prCache);
+
+vi.mock('../../../../util/jira/create-issue');
+const createJiraIssue = vi.mocked(jira.createJiraIssue);
 
 describe('workers/repository/update/pr/index', () => {
   describe('ensurePr', () => {
@@ -67,6 +71,7 @@ describe('workers/repository/update/pr/index', () => {
       baseBranch: 'base',
       upgrades: [],
       prTitle,
+      repository: 'some/repo',
     };
 
     beforeEach(() => {
@@ -89,6 +94,40 @@ describe('workers/repository/update/pr/index', () => {
           'PR created',
         );
         expect(prCache.setPrCache).toHaveBeenCalled();
+      });
+
+      it('creates Jira issue and updates title', async () => {
+        platform.createPr.mockResolvedValueOnce(pr);
+        createJiraIssue.mockResolvedValueOnce('PROJ-1');
+
+        const res = await ensurePr({
+          ...config,
+          jiraBaseUrl: 'https://jira',
+          jiraProjectKey: 'PROJ',
+          jiraIssueType: 'Task',
+          jiraUsername: 'user',
+          jiraToken: 'tok',
+          jiraLabels: ['deps'],
+        });
+
+        expect(res).toEqual({
+          type: 'with-pr',
+          pr: { ...pr, title: '[PROJ-1] ' + prTitle },
+        });
+        expect(createJiraIssue).toHaveBeenCalledWith({
+          baseUrl: 'https://jira',
+          projectKey: 'PROJ',
+          issueType: 'Task',
+          summary: prTitle,
+          description: body,
+          username: 'user',
+          token: 'tok',
+          labels: ['some/repo', sourceBranch, 'deps'],
+        });
+        expect(platform.updatePr).toHaveBeenCalledWith({
+          number,
+          prTitle: '[PROJ-1] ' + prTitle,
+        });
       });
 
       it('aborts PR creation once limit is exceeded', async () => {
