@@ -44,6 +44,7 @@ import {
   validatePrCache,
 } from './pr-fingerprint';
 import { tryReuseAutoclosedPr } from './pr-reuse';
+import { createJiraIssue } from '../../../../util/jira/create-issue';
 
 export function getPlatformPrOptions(
   config: RenovateConfig & PlatformPrOptions,
@@ -500,6 +501,36 @@ export async function ensurePr(
         incCountValue('ConcurrentPRs');
         incCountValue('HourlyPRs');
         logger.info({ pr: pr?.number, prTitle }, 'PR created');
+        if (
+          config.jiraBaseUrl &&
+          config.jiraProjectKey &&
+          config.jiraIssueType &&
+          config.jiraUsername &&
+          config.jiraToken &&
+          pr
+        ) {
+          try {
+            const key = await createJiraIssue({
+              baseUrl: config.jiraBaseUrl,
+              projectKey: config.jiraProjectKey,
+              issueType: config.jiraIssueType,
+              summary: prTitle,
+              description: prBody,
+              username: config.jiraUsername,
+              token: config.jiraToken,
+              labels: [
+                config.repository || '',
+                config.branchName,
+                ...(config.jiraLabels ?? []),
+              ],
+            });
+            const newTitle = `[${key}] ${prTitle}`;
+            await platform.updatePr({ number: pr.number, prTitle: newTitle });
+            pr.title = newTitle;
+          } catch (err) {
+            logger.warn({ err }, 'Failed to create Jira issue');
+          }
+        }
       } catch (err) {
         logger.debug({ err }, 'Pull request creation error');
         if (
